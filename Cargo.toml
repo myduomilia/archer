@@ -1,5 +1,5 @@
 [package]
-name = "archer"
+name = "archers"
 version = "0.1.0"
 authors = ["myduomilia <myduomilia@gmail.com>"]
 edition = "2018"
@@ -12,3 +12,4 @@ log = "0.4.11"
 async-std = "1.6.3"
 async-channel = "1.4.1"
 async-timer = "0.7.4"
+async-listen = "0.2.1"

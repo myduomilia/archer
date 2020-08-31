@@ -5,7 +5,7 @@ use log::{debug, error, info};
 use std::{fs};
 use std::sync::Arc;
 use std::option::Option::Some;
-use std::collections::{BTreeMap};
+use std::collections::{HashMap};
 use std::path::Path;
 use std::time::{Duration, Instant};
 use async_timer::timed;
@@ -76,7 +76,7 @@ fn spawn_read<F>(fut: F, tx_ev: Sender<Event>, key: u32, stream: Arc<TcpStream>)
 
 async fn broker_loop(rx_req: Sender<Request>, mut tx_ev: Sender<Event>, mut rx_ev: Receiver<Event>) -> Result<()> {
     let mut idx = 0;
-    let mut connections: BTreeMap<u32, Arc<TcpStream>> = BTreeMap::new();
+    let mut connections: HashMap<u32, Arc<TcpStream>> = HashMap::new();
     while let Some(event) = rx_ev.next().await {
         match event {
             Event::Connection {stream} => {
@@ -119,7 +119,7 @@ async fn broker_loop(rx_req: Sender<Request>, mut tx_ev: Sender<Event>, mut rx_e
 
 async fn write(stream: Arc<TcpStream>, payload: Arc<Vec<u8>>) -> Result<()> {
     let mut stream = &*stream;
-    let header_image = format!("HTTP/1.1 200 OK\x0d\x0aConnection: keep-alive\x0d\x0aMax-Age: 0\x0d\x0aExpires: 0\x0d\x0aCache-Control: no-cache, private\x0d\x0aPragma: no-cache\x0d\x0aContent-Type: text/plan\x0d\x0aContent-Length: {}\x0d\x0a\x0d\x0a", payload.len());
+    let header_image = format!("HTTP/1.1 200 OK\x0d\x0aConnection: close\x0d\x0aMax-Age: 0\x0d\x0aExpires: 0\x0d\x0aCache-Control: no-cache, private\x0d\x0aPragma: no-cache\x0d\x0aContent-Type: text/plan\x0d\x0aContent-Length: {}\x0d\x0a\x0d\x0a", payload.len());
     stream.write_all(header_image.as_bytes()).await?;
     stream.write_all(&payload[..]).await?;
     Ok(())
